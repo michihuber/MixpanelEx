@@ -1,2 +1,5 @@
-%{"exjsx": {:hex, :exjsx, "3.1.0", "d419162cb2d5be80070835c2c2b8c78c8c45907706c991d23f3750dae506d1e9", [:mix], [{:jsx, "~> 2.4.0", [hex: :jsx, optional: false]}]},
-  "jsx": {:hex, :jsx, "2.4.0", "fb83830ac15e981b6ce310b645324ceecd01b1e0847d23921c33df829de5d2db", [:mix], []}}
+%{"exactor": {:hex, :exactor, "2.2.2", "90b27d72c05614801a60f8400afd4e4346dfc33ea9beffe3b98a794891d2ff96", [:mix], []},
+  "exjsx": {:hex, :exjsx, "3.2.1", "1bc5bf1e4fd249104178f0885030bcd75a4526f4d2a1e976f4b428d347614f0f", [:mix], [{:jsx, "~> 2.8.0", [hex: :jsx, optional: false]}]},
+  "exvcr": {:hex, :exvcr, "0.8.3", "432557201917f54bc6d78e9214f9d7c074aa4d67c5e7b5f51a1d391aad7fa31b", [:mix], [{:exactor, "~> 2.2", [hex: :exactor, optional: false]}, {:exjsx, "~> 3.2", [hex: :exjsx, optional: false]}, {:httpoison, "~> 0.8", [hex: :httpoison, optional: true]}, {:httpotion, "~> 3.0", [hex: :httpotion, optional: true]}, {:ibrowse, "~> 4.2.2", [hex: :ibrowse, optional: true]}, {:meck, "~> 0.8.3", [hex: :meck, optional: false]}]},
+  "jsx": {:hex, :jsx, "2.8.0", "749bec6d205c694ae1786d62cea6cc45a390437e24835fd16d12d74f07097727", [:mix, :rebar], []},
+  "meck": {:hex, :meck, "0.8.4", "59ca1cd971372aa223138efcf9b29475bde299e1953046a0c727184790ab1520", [:make, :rebar], []}}
