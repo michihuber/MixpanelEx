@@ -15,57 +15,46 @@ defmodule Mixpanel.Client do
     GenServer.start_link(__MODULE__, state, [name: :mixpanel_client])
   end
 
-  def track(event, properties) do
-    GenServer.cast(:mixpanel_client, {:track, event, properties})
-  end
-
-  def track(events) when is_list(events) do
+  def track(events) do
     GenServer.cast(:mixpanel_client, {:track, events})
   end
 
-  def engage(event) when is_map(event) do
-    GenServer.cast(:mixpanel_client, {:engage, event})
-  end
-
-  def engage(events) when is_list(events) do
+  def engage(events) do
     GenServer.cast(:mixpanel_client, {:engage, events})
   end
 
-  def handle_cast({:track, event, properties}, state)  do
-    properties = Dict.put(properties, :token, state.token)
-    {:ok, json} = JSX.encode(event: event, properties: properties)
-    bulk_post(json, state.connection, @track_endpoint)
+  def handle_cast({:track, events}, state) do
+    events
+    |> Enum.map(&put_in(&1, [:properties, :token], state.token))
+    |> bulk_post(@track_endpoint, state)
+  end
+
+  def handle_cast({:engage, events}, state) do
+    events
+    |> Enum.map(&Map.put(&1, :"$token", state.token))
+    |> bulk_post(@engage_endpoint, state)
+  end
+
+  defp bulk_post(data, endpoint, state) do
+    data
+    |> encode_body
+    |> post(endpoint, state.connection)
+    |> log_errors
     {:noreply, state}
   end
 
-  def handle_cast({:track, events}, state) when is_list(events) do
-    events = Enum.map(events, &put_in(&1, [:properties, :token], state.token))
-    {:ok, json} = JSX.encode(events)
-    bulk_post(json, state.connection, @track_endpoint)
-    {:noreply, state}
+  defp encode_body(data) do
+    json = JSX.encode!(data)
+    String.to_char_list("data=#{ :base64.encode(json) }")
   end
 
-  def handle_cast({:engage, event}, state) when is_map(event) do
-    events = [Map.put(event, :"$token", state.token)]
-    {:ok, json} = JSX.encode(events)
-    bulk_post(json, state.connection, @engage_endpoint)
-    {:noreply, state}
-  end
-
-  def handle_cast({:engage, events}, state) when is_list(events) do
-    events = Enum.map(events, &Map.put(&1, :"$token", state.token))
-    {:ok, json} = JSX.encode(events)
-    bulk_post(json, state.connection, @engage_endpoint)
-    {:noreply, state}
-  end
-
-  defp bulk_post(json, connection, endpoint) do
-    body = String.to_char_list("data=#{ :base64.encode(json) }")
+  defp post(body, endpoint, connection) do
     request = {endpoint, _headers = [], _content_type = 'text/plain', body}
-    result = :httpc.request(:post, request, _http_opts=[], _opts=[], connection)
-    case result do
-      {:ok, {_, _, @success_response_body}} -> :ok
-      _ -> Logger.warn("Problem with mixpanel event: " <> inspect(result))
-    end
+    :httpc.request(:post, request, _http_opts=[], _opts=[], connection)
+  end
+
+  defp log_errors({:ok, {_, _, @success_response_body}}), do: :ok
+  defp log_errors(result) do
+    Logger.warn("Problem with mixpanel event: " <> inspect(result))
   end
 end

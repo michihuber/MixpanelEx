@@ -18,23 +18,23 @@ defmodule Mixpanel do
 
   def track(event, properties, timestamp \\ nil) do
     properties = Mixpanel.Util.add_timestamp(properties, timestamp)
-    Mixpanel.Client.track(event, properties)
-    :ok
+    track([%{event: event, properties: properties}])
   end
 
-  def track(event) when is_binary(event), do: track(event, [])
+  def track(event) when is_binary(event) do
+    track(event, [])
+  end
+
   def track(events) when is_list(events) do
     Mixpanel.Client.track(events)
-    :ok
   end
 
   def engage(event) when is_map(event) do
-    Mixpanel.Client.engage(event)
-    :ok
+    engage([event])
   end
+
   def engage(events) when is_list(events) do
     Mixpanel.Client.engage(events)
-    :ok
   end
 
   defmodule Util do
