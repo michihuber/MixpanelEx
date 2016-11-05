@@ -13,6 +13,9 @@ defmodule Mixpanel.Mixfile do
        licenses: ["MIT"],
        links: %{"Github" => "https://github.com/michihuber/mixpanel_ex"},
      ],
+     preferred_cli_env: [
+        vcr: :test, "vcr.delete": :test, "vcr.check": :test, "vcr.show": :test
+      ],
     ]
   end
 
@@ -23,7 +26,7 @@ defmodule Mixpanel.Mixfile do
   end
 
   defp deps do
-    [{:exjsx, "~> 3.1.0"}]
+    [{:exjsx, "~> 3.1"},
+     {:exvcr, "~> 0.7", only: :test}]
   end
 end
-
